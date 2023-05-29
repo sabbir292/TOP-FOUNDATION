@@ -1,42 +1,106 @@
-const grid = prompt('choose the grid size, maximum 100x100');
-
-
+let defaultColor = '#000';
+let color = defaultColor;
+let grid = 16;
 let isRandom = false;
 let eraser = false;
+let gridItems = null
 
-// console.log(randomColor)
 const gridContainer = document.querySelector('.container')
-gridContainer.style.display = `grid`;
-gridContainer.style.gridTemplateColumns = `repeat(${grid}, 1fr)`;
+const sizeBtn = document.querySelector('.grid-size')
+const rainbowBtn = document.querySelector('.rainbow')
+const eraserBtn = document.querySelector('.eraser')
+const resetBtn = document.querySelector('.reset')
 
-for (let i = 0; i < grid; i++) {
+sizeBtn.addEventListener('click', optGridSize)
+rainbowBtn.addEventListener('click',()=> {
+    isRandom = true
+    eraser = false
+    defaultColor = null
+})
 
-    for (let j = 0; j < grid; j++) {
-        const gridItem = document.createElement('div')
-        gridItem.classList.add('grid-item')
-        gridContainer.appendChild(gridItem)
+eraserBtn.addEventListener('click',()=> {
+    isRandom = false
+    eraser = true
+    defaultColor = null
+})
+resetBtn.addEventListener('click',()=> {
+    isRandom = false
+    eraser = true
+    grid = 16
+    defaultColor = '#000'
+    createGrid()
+})
+
+function createGrid(){ 
+
+    while(gridContainer.firstChild){
+        gridContainer.firstChild.remove()
+    }
+
+   for (let i = 0; i < grid; i++) {
+    
+        for (let j = 0; j < grid; j++) {
+            const gridItem = document.createElement('div')
+            gridItem.classList.add('grid-item')
+            gridContainer.appendChild(gridItem)
+        }
+    }
+    gridContainer.style.display = `grid`;
+    gridContainer.style.gridTemplateColumns = `repeat(${grid}, 1fr)`;
+    gridItems = document.querySelectorAll('.grid-item')
+
+
+    gridItems.forEach(item => {
+        item.addEventListener('mouseover', () => {
+            
+            const randomColor = createRandomColor()
+             color = defaultColor
+    
+            if (defaultColor) {
+                // item.style.background = 'black'
+                color = defaultColor
+            }
+            else if (isRandom) {
+                // item.style.background = randomColor
+                color = randomColor
+            }
+            else if(eraser){
+                color = 'rgb(217, 223, 223)'
+            }
+            // else{
+            //     item.style.background = defaultColor
+            // }
+            item.style.background = color
+        })
+    })
+}
+createGrid()
+
+
+function optGridSize(){
+    const gridSize = prompt('Choose your preffered grid size. make sure it is not more than 100', 16)
+
+    if(gridSize>100){
+        alert('Kindly choose a size within 100')
+    }else{
+        grid = gridSize
+        createGrid()
+        defaultColor = "#000"
     }
 }
+// optGridSize() // this function will properly work once you clear the previous grids or this function will add choosen grids to existing grids
 
-const gridItems = document.querySelectorAll('.grid-item')
 
-gridItems.forEach(item => {
-    item.addEventListener('mouseover', () => {
+// const gridItems = document.querySelectorAll('.grid-item')
 
-        const red = Math.floor(Math.random() * 256)
-        const green = Math.floor(Math.random() * 256)
-        const blue = Math.floor(Math.random() * 256)
-        const alpha = Math.random()
+function createRandomColor(){
 
-        const randomColor = `rgba(${red}, ${green}, ${blue}, ${alpha})`
-        if (!isRandom && !eraser) {
-            item.style.background = 'black'
-        }
-        else if (isRandom) {
-            item.style.background = randomColor
-        }
-        else if(eraser){
-            item.style.background = 'white'
-        }
-    })
-})
+    const red = Math.floor(Math.random() * 256)
+    const green = Math.floor(Math.random() * 256)
+    const blue = Math.floor(Math.random() * 256)
+    const alpha = Math.random()
+
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`
+}
+
+
